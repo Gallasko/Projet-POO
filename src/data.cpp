@@ -1,10 +1,5 @@
 #include "data.h"
 
-Data::Data()
-{
-
-}
-
 void Data::load(std::string path)
 {
     std::fstream fs;
@@ -37,10 +32,42 @@ void Data::load(std::string path)
 
             Sample sample(tag, fVector);
             data.push_back(sample);
+
+            std::vector<std::string>().swap(fVector);
         }
     }
     else
     {
         std::cout << "Error opening file" << std::endl;
     }
+}
+
+Data Data::split(int pos)
+{
+    if(pos < data.size())
+    {
+        std::vector<Sample> splitLow(data.begin(), data.begin() + pos);
+        std::vector<Sample> splitHigh(data.begin() + pos, data.end() );
+
+        Data halfData(splitHigh, data.size() - pos, nbFeatures);
+
+        data = splitLow;
+        nbSamples = pos;
+
+        return halfData;
+    }
+    else
+        return Data();
+}
+
+
+Data Data::split(float percentage)
+{
+    return split(static_cast<int>(data.size() * percentage));
+}
+
+void Data::append(Data data)
+{
+    this->data.insert(this->data.end(), data.begin(), data.end());
+    nbSamples = this->data.size();
 }
