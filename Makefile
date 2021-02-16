@@ -6,14 +6,8 @@
 # Wildcard use to get recursively all the .cpp
 rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
 
-# Qt path
-Qt_PATH := Z:/Qt/5.11.2-x64
-
 # define the Cpp compiler to use
 CXX = g++
-
-# define the moc
-MOC = $(Qt_PATH)/bin/moc.exe
 
 # define any compile-time flags
 CXXFLAGS	:= -std=c++11 -Wall -Wextra -g
@@ -30,14 +24,10 @@ OUTPUT	:= output
 SRC		:= src
 
 # define include directory
-INCLUDE	:= include \
-		   $(Qt_PATH)/include \
-		   $(Qt_PATH)/include/QtCore \
-		   $(Qt_PATH)/include/QtGui
+INCLUDE	:= include
 
 # define lib directory
-LIB		:= lib \
-		   $(Qt_PATH)/lib
+LIB		:= lib 
 
 DEPENDENCIES := dependencies
 
@@ -65,16 +55,14 @@ endif
 INCLUDES	:= $(patsubst %,-I%, $(INCLUDEDIRS:%/=%))
 
 # define the C libs
-LIBS		:= $(patsubst %,-L%, $(LIBDIRS:%/=%)) \
-			   -lQt5Gui \
-			   -lQt5Core
+LIBS		:= $(patsubst %,-L%, $(LIBDIRS:%/=%))
 
 # define the C source files
 SOURCES		:= $(call rwildcard,$(SOURCEDIRS), *.cpp)
 MOC_SOURCES	:= $(call rwildcard,$(SOURCEDIRS), *.h)
 
 # define the C object files 
-OBJECTS		:= $(SOURCES:.cpp=.o) $(MOC_SOURCES:.h=.moc.o) 
+OBJECTS		:= $(SOURCES:.cpp=.o)
 
 #
 # The following part of the makefile is generic; it can be used to 
@@ -104,10 +92,6 @@ $(MAIN): $(OBJECTS)
 %.o: %.cpp
 	@echo Converting $< to $@
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $<  -o $@
-
-%.moc.cpp: %.h
-	@echo Creating $@
-	$(MOC) $(INCLUDES) $< -o $@
 
 .PHONY: clean
 
